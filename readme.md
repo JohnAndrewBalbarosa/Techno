@@ -92,3 +92,41 @@
 - [ ] Monitor system performance and gather user feedback.
 - [ ] Plan for scalability by adding more Barangays to the hub-and-spoke system.
 - [ ] Continuously improve features based on feedback and emerging needs.
+
+## Architecture (UML)
+
+```mermaid
+graph TD
+    CityHall["🏛️ City Hall<br/>(Central Hub)"]
+    Barangay["📍 Barangay<br/>(Data Mart)"]
+    Farmers["👨‍🌾 Farmers<br/>(SMS Access)"]
+    Merchants["🏪 Merchants<br/>(Web Portal)"]
+    
+    subgraph "Backend (Python Flask)"
+        DB["🗄️ Central Database<br/>(Hub)"]
+        DataMart["📊 Barangay Data Mart<br/>(Spoke)"]
+        APIs["🔌 APIs<br/>(Farmers, Orders,<br/>Products, Users,<br/>Government)"]
+        AIMod["🤖 AI Module<br/>(Disaster Analysis)"]
+    end
+    
+    subgraph "Communication Layer"
+        SIMGateway["📱 SIM/SMS Gateway<br/>(Broadband-to-SIM)"]
+        JSONMessaging["📦 JSON Messaging<br/>(Barangay ↔ Hub)"]
+    end
+    
+    CityHall -->|Manage Warnings| APIs
+    Barangay -->|Forward Messages| JSONMessaging
+    JSONMessaging -->|Update| DataMart
+    DataMart -->|Sync| DB
+    
+    Farmers -->|SMS Response<br/>YES + Price| SIMGateway
+    SIMGateway -->|Parse| APIs
+    APIs -->|Analyze| AIMod
+    AIMod -->|Insights| CityHall
+    
+    Merchants -->|Submit Requests| APIs
+    APIs -->|Track Status| Merchants
+    
+    APIs -->|Send Warnings| SIMGateway
+    SIMGateway -->|Alert| Farmers
+```
